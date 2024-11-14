@@ -5,14 +5,16 @@
 param (
     [Parameter(Mandatory = $true)]
     $Target = $1,
-    $State = "./integ",
-    $enableDeletedLog = $true,
-    $enableCreatedLog = $false
+    [string] $State = "/integ",
+    [bool] $enableDeletedLog = $true,
+    [bool] $enableCreatedLog = $false
 )
+$startTime = get-date
+$startTimeStamp = get-date -UFormat "+%Y-%m-%dT%T"
 #
 $stateFile = "$State/lastrun.state"
-$deletedLog = "$State/deleted.log"
-$createdLog = "$State/created.log"
+$deletedLog = "$State/$startTimeStamp-deleted.log"
+$createdLog = "$State/$startTimeStamp-created.log"
 #
 #
 function Write-Log {
@@ -68,6 +70,7 @@ if ($wasCreated -and $enableCreatedLog) {
     Add-Content -Path "$createdLog" -Value ("[{0}]`n$wasCreated`n" -f (get-date -UFormat "+%Y-%m-%dT%T"))
 }
 #
-Write-Log "Finished."
+$endTime = get-date
+Write-Log ("Finished. Completed in [{0}]s" -f (($endTime - $startTime).TotalSeconds))
 #
 #
